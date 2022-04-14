@@ -88,7 +88,7 @@ jobs:
         target:
           - Dockerfile: build/Dockerfile
           - Dockerfile-darwin: build/darwin.Dockerfile
-          - DockerRepo: zc2638/ddshop
+          - DockerRepo: a526102465/ddshop
     steps:
       - uses: actions/checkout@v3
 
