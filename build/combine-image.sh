@@ -26,6 +26,7 @@ for tag in "${TAGS[@]}"; do
     docker push "$REPOSITORY":"$tag"-"$arch"
     manifestCreateCmd="$manifestCreateCmd $REPOSITORY:$tag-$arch"
   done
+  manifestCreateCmd="$manifestCreateCmd $REPOSITORY:$tag-darwin"
   doCreate="$($manifestCreateCmd)"
   echo "$doCreate"
   docker manifest push "$REPOSITORY":"$tag"

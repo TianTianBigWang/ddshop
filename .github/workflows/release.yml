@@ -139,7 +139,7 @@ jobs:
 #          cache-to: type=gha,mode=max,scope=${{ github.workflow }}
           tags: |
             ${{ matrix.target.DockerRepo }}:${{ steps.prepare.outputs.full_tag_name }}-darwin
-            ${{ matrix.target.DockerRepo }}:${{ steps.prepare.outputs.latest_tag }}
+            ${{ matrix.target.DockerRepo }}:${{ steps.prepare.outputs.latest_tag }}-darwin
 
       - name: Combination image bash script
         shell: bash
