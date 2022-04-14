@@ -13,6 +13,11 @@ IFS=',' read -r -a TAGS <<< "$TAG"
 #    echo "$tag"
 #done
 
+# darwin image
+for tag in "${TAGS[@]}"; do
+  docker pull --platform arm64 "$REPOSITORY":"$tag"-darwin
+done
+
 for arch in "${ARCHS[@]}" ; do
   for tag in "${TAGS[@]}"; do
     docker pull --platform "$arch" "$REPOSITORY":"$tag"
