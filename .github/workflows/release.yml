@@ -87,6 +87,8 @@ jobs:
       matrix:
         target:
           - Dockerfile: build/Dockerfile
+          - Dockerfile-darwin: build/darwin.Dockerfile
+          - DockerRepo: zc2638/ddshop
     steps:
       - uses: actions/checkout@v3
 
@@ -96,7 +98,6 @@ jobs:
           TAG=${GITHUB_REF#refs/tags/}
           DATE=$(date +'%Y-%m-%d_%H-%M-%S')
           echo ::set-output name=full_tag_name::${TAG}
-          echo ::set-output name=full_date_tag::${DATE}
           echo ::set-output name=latest_tag::latest
 
       - name: Set up QEMU
@@ -119,10 +120,32 @@ jobs:
           push: true
           builder: ${{ steps.buildx.outputs.name }}
           file: ${{ matrix.target.Dockerfile }}
-          platforms: linux/amd64,linux/arm64,linux/arm,darwin/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm
           cache-from: type=gha,scope=${{ github.workflow }}
           cache-to: type=gha,mode=max,scope=${{ github.workflow }}
           tags: |
-            zc2638/ddshop:${{ steps.prepare.outputs.full_tag_name }}
-            zc2638/ddshop:${{ steps.prepare.outputs.full_date_tag }}
-            zc2638/ddshop:${{ steps.prepare.outputs.latest_tag }}
+            ${{ matrix.target.DockerRepo }}:${{ steps.prepare.outputs.full_tag_name }}
+            ${{ matrix.target.DockerRepo }}:${{ steps.prepare.outputs.latest_tag }}
+
+      - name: Build darwin image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: false
+          builder: ${{ steps.buildx.outputs.name }}
+          file: ${{ matrix.target.Dockerfile-darwin }}
+          platforms: linux/arm64
+          cache-from: type=gha,scope=${{ github.workflow }}
+#          cache-to: type=gha,mode=max,scope=${{ github.workflow }}
+          tags: |
+            ${{ matrix.target.DockerRepo }}:${{ steps.prepare.outputs.full_tag_name }}-darwin
+            ${{ matrix.target.DockerRepo }}:${{ steps.prepare.outputs.latest_tag }}
+
+      - name: Combination image bash script
+        shell: bash
+        env:
+          REPOSITORY: ${{ matrix.target.DockerRepo }}
+          TAG: ${{ steps.prepare.outputs.full_tag_name }},${{ steps.prepare.outputs.latest_tag }}
+        run: |
+          chmod +x ./build/combine-image.sh
+          ./build/combine-image.sh
