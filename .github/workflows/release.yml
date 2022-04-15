@@ -126,20 +126,6 @@ jobs:
             ${{ env.DockerRepo }}:${{ steps.prepare.outputs.full_tag_name }}
             ${{ env.DockerRepo }}:${{ steps.prepare.outputs.latest_tag }}
 
-      - name: Build darwin image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: false
-          builder: ${{ steps.buildx.outputs.name }}
-          file: ${{ env.Dockerfile-darwin }}
-          platforms: linux/arm64
-          cache-from: type=gha,scope=${{ github.workflow }}
-#          cache-to: type=gha,mode=max,scope=${{ github.workflow }}
-          tags: |
-            ${{ env.DockerRepo }}:${{ steps.prepare.outputs.full_tag_name }}-darwin
-            ${{ env.DockerRepo }}:${{ steps.prepare.outputs.latest_tag }}-darwin
-
   darwin-release:
     runs-on: macos-latest
     steps:
@@ -165,7 +151,6 @@ jobs:
       - name: Build
         run: |
           docker buildx build -f ${{ env.Dockerfile-darwin }} \
-          --builder ${{ steps.buildx.outputs.name }} \
           --platform linux/arm64 \
           --cache-from type=gha,scope=${{ github.workflow }} \
           -t ${{ env.DockerRepo }}:${{ steps.prepare.outputs.full_tag_name }}-darwin \
